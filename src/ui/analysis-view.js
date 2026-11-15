@@ -3,14 +3,16 @@ import { renderBurnCalendarLegend } from '../charts/burn-calendar-legend.js';
 import { SENSOR_MILESTONES } from '../data/sensor-catalog.js';
 import { monthLabel, RECORD_START_YEAR, monthIndexOf } from '../time/month-index.js';
 import { createAnalysisHeader } from './analysis-header.js';
+import { createAnomaliesTab } from './anomalies-tab.js';
 import { createKpiCards } from './kpi-cards.js';
 import { renderLatestMonthLine } from './latest-month-line.js';
 import { createTimeSeriesTab } from './time-series-tab.js';
 
-export function createAnalysisView({ header, kpiContainer, latestMonthElement, tabsElement, calendarElements, timeSeriesElements, tooltip, onMonthSelected }) {
+export function createAnalysisView({ header, kpiContainer, latestMonthElement, tabsElement, calendarElements, timeSeriesElements, anomalyElements, tooltip, onMonthSelected, onBaselineChange }) {
   const analysisHeader = createAnalysisHeader(header);
   const kpiCards = createKpiCards(kpiContainer);
   const timeSeriesTab = createTimeSeriesTab({ elements: timeSeriesElements, tooltip });
+  const anomaliesTab = createAnomaliesTab({ elements: anomalyElements, tooltip, onBaselineChange, onMonthSelected });
   const { chart, legend, footnote } = calendarElements;
 
   return {
@@ -29,6 +31,7 @@ export function createAnalysisView({ header, kpiContainer, latestMonthElement, t
       renderBurnCalendarLegend(legend, edges, summary);
       footnote.textContent = calendarFootnote();
       timeSeriesTab.show(result, summary.range);
+      anomaliesTab.show(result, summary, selectedMonthIndex);
       tabsElement.hidden = false;
     },
   };

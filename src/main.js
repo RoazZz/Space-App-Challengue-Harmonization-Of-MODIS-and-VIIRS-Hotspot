@@ -74,7 +74,22 @@ const analysisView = createAnalysisView({
     legend: byId('time-series-legend'),
     footnote: byId('time-series-footnote'),
   },
+  anomalyElements: {
+    statisticButtons: allOf('[data-baseline-statistic]'),
+    firstYearSelect: byId('baseline-first-year'),
+    lastYearElement: byId('baseline-last-year'),
+    focusYearSelect: byId('focus-year'),
+    grid: byId('anomaly-grid'),
+    legend: byId('anomaly-legend'),
+    focusChart: byId('focus-chart'),
+    focusLegend: byId('focus-legend'),
+    footnote: byId('anomaly-footnote'),
+  },
   tooltip,
+  onBaselineChange: (change) => {
+    analysisState.baselineSettings = { ...analysisState.baselineSettings, ...change };
+    renderAnalysis();
+  },
   onMonthSelected: (monthIndex) => {
     showMapMonth(monthIndex);
     toast.show(`Map now shows ${monthLabel(monthIndex)}.`);
@@ -85,7 +100,7 @@ const recordWindow = createRecordWindow();
 const dataSourceReady = loadLandArea(APP_CONFIG.landMaskPath).then((landArea) => createSimulatedFireDataSource({ landArea, recordWindow }));
 const analyzerReady = dataSourceReady.then(createAreaAnalyzer);
 dataSourceReady.then(({ isDemoData }) => showDemoNotices(isDemoData));
-const analysisState = { result: null, mapMonthIndex: null };
+const analysisState = { result: null, mapMonthIndex: null, baselineSettings: DEFAULT_BASELINE_SETTINGS };
 let latestAnalysisId = 0;
 
 const mapSection = createMapSection({
@@ -137,7 +152,7 @@ function renderAnalysis() {
   if (!contains(range, analysisState.mapMonthIndex)) {
     analysisState.mapMonthIndex = defaultMapMonth(result, range);
   }
-  analysisView.show(result, summarizePeriod(result, range, DEFAULT_BASELINE_SETTINGS), analysisState.mapMonthIndex);
+  analysisView.show(result, summarizePeriod(result, range, analysisState.baselineSettings), analysisState.mapMonthIndex);
   mapSection.show(result, analysisState.mapMonthIndex);
 }
 

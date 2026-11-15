@@ -121,12 +121,34 @@
     <div class="analysis-tabs" id="analysis-tabs" hidden>
       <div class="tab-bar">
         <button type="button" data-tab="calendar" class="is-selected">Burn calendar</button>
+        <button type="button" data-tab="anomalies">Anomalies</button>
         <button type="button" data-tab="time-series">Time series</button>
       </div>
       <div class="tab-pane" data-tab-pane="calendar">
         <div id="calendar-chart"></div>
         <div id="calendar-legend"></div>
         <p class="footnote" id="calendar-footnote"></p>
+      </div>
+      <div class="tab-pane" data-tab-pane="anomalies" hidden>
+        <div class="chart-tools">
+          <span class="tool-label">Baseline</span>
+          <div class="segmented-control compact">
+            <button type="button" data-baseline-statistic="median" class="is-selected">Median</button>
+            <button type="button" data-baseline-statistic="mean">Mean</button>
+          </div>
+          <span class="tool-label">years</span>
+          <select class="inline-select" id="baseline-first-year" aria-label="Baseline first year"></select>
+          <span class="tool-label" id="baseline-last-year"></span>
+        </div>
+        <div id="anomaly-grid"></div>
+        <div id="anomaly-legend"></div>
+        <div class="chart-tools spaced-field">
+          <span class="tool-label">Year in focus</span>
+          <select class="inline-select" id="focus-year" aria-label="Year in focus"></select>
+        </div>
+        <div id="focus-chart"></div>
+        <div class="legend" id="focus-legend"></div>
+        <p class="footnote" id="anomaly-footnote"></p>
       </div>
       <div class="tab-pane" data-tab-pane="time-series" hidden>
         <div class="chart-tools">

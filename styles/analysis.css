@@ -170,6 +170,16 @@
   white-space: nowrap;
 }
 
+.tool-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.inline-select {
+  width: auto;
+  padding: 4px 6px;
+}
+
 .checkbox {
   display: flex;
   gap: 8px;
