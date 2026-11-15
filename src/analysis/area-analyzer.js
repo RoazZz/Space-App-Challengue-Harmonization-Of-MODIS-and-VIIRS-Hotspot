@@ -5,6 +5,7 @@ import { assessHarmonization } from '../harmonization/harmonization-confidence.j
 import { createFeatureEncoder } from '../harmonization/harmonization-features.js';
 import { trainHarmonizationModel } from '../harmonization/harmonization-model.js';
 import { aggregateUnitIntoArea, createEmptySeries } from './area-series.js';
+import { createCellGrid } from './cell-grid.js';
 import { groupIntoStratumUnits, unitSamples } from './stratum-units.js';
 
 export function createAreaAnalyzer(dataSource) {
@@ -19,15 +20,14 @@ export function createAreaAnalyzer(dataSource) {
     const model = trainHarmonizationModel(samplesByUnit.flat(), encodeFeatures);
     const series = createEmptySeries(recordWindow.monthCount);
     const coverageByTile = new Map(tileCountsList.map((tileCounts) => [tileCounts.tileId, cellCoverageFractions(tileCounts.cells, area)]));
-    units.forEach((unit, index) => {
-      const predictions = samplesByUnit[index].map(model.predict);
-      aggregateUnitIntoArea(unit, coverageByTile.get(unit.tileCounts.tileId), predictions, series);
-    });
+    const predictionsByUnit = samplesByUnit.map((samples) => samples.map(model.predict));
+    units.forEach((unit, index) => aggregateUnitIntoArea(unit, coverageByTile.get(unit.tileCounts.tileId), predictionsByUnit[index], series));
     const observationCoverage = areaObservationCoverage(tileCountsList, coverageByTile, recordWindow.monthCount);
-    return describeAreaSeries(area, level, series, observationCoverage);
+    const cellGrid = createCellGrid(units, predictionsByUnit, coverageByTile);
+    return describeAreaSeries(area, level, series, observationCoverage, cellGrid);
   }
 
-  function describeAreaSeries(area, level, { modis, viirs, estimated }, observationCoverage) {
+  function describeAreaSeries(area, level, { modis, viirs, estimated }, observationCoverage, cellGrid) {
     const lastCompleteMonth = recordWindow.lastMonthIndex - 1;
     const overlapMonths = [];
     for (let month = SENSOR_MILESTONES.viirsNoaa20Start; month <= lastCompleteMonth; month += 1) {
@@ -41,6 +41,9 @@ export function createAreaAnalyzer(dataSource) {
       modis,
       viirs,
       observationCoverage,
+      cellGrid,
+      strata: dataSource.strata,
+      isDemoData: dataSource.isDemoData,
       harmonization,
       ...harmonizedSeries(viirs, estimated, harmonization.logUncertainty),
     });
