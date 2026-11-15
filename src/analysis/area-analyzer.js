@@ -42,6 +42,9 @@ export function createAreaAnalyzer(dataSource) {
       viirs,
       observationCoverage,
       cellGrid,
+      detectionsForMonth: (monthIndex) => cellGrid.coveredCellReferences
+        .flatMap(({ tileId, cellIndex }) => dataSource.listDetections(tileId, cellIndex, monthIndex))
+        .filter(({ latitude, longitude }) => area.contains(latitude, longitude)),
       strata: dataSource.strata,
       isDemoData: dataSource.isDemoData,
       harmonization,

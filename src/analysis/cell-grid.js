@@ -22,7 +22,11 @@ export function createCellGrid(units, predictionsByUnit, coverageByTile) {
     });
   }
 
-  return { cellsForMonth, coveredCells: coveredCells.map(({ cell }) => cell) };
+  return {
+    cellsForMonth,
+    coveredCells: coveredCells.map(({ cell }) => cell),
+    coveredCellReferences: coveredCells.map(({ unit, cellIndex }) => ({ tileId: unit.tileCounts.tileId, cellIndex })),
+  };
 }
 
 function modisToHarmonizedRatio(unit, predictions, monthIndex) {
