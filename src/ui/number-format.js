@@ -22,3 +22,11 @@ export function formatCompact(value) {
   const step = COMPACT_STEPS.find(({ minimum }) => Math.abs(value) >= minimum);
   return step ? `${(value / step.divisor).toFixed(step.digits)}${step.suffix}` : String(Math.round(value));
 }
+
+export function formatSignedPercent(ratio) {
+  if (!Number.isFinite(ratio)) {
+    return MISSING_VALUE;
+  }
+  const percent = Math.round(ratio * 100);
+  return `${percent > 0 ? '+' : ''}${percent}%`;
+}
