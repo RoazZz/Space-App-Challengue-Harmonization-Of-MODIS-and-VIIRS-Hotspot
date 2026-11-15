@@ -39,3 +39,13 @@ export function densityColor(density) {
   const classIndex = DENSITY_CLASS_EDGES.findIndex((edge) => density < edge);
   return SEQUENTIAL_COLORS[classIndex === -1 ? CLASS_COUNT - 1 : classIndex];
 }
+
+export const DIVERGING_COLORS = Object.freeze(['#2166ac', '#4393c3', '#92c5de', '#4b535c', '#f4a582', '#d6604d', '#b2182b']);
+export const DIVERGING_RATIO_EDGES = Object.freeze([0.25, 0.5, 0.8, 1.25, 2, 4]);
+export const DIVERGING_LABELS = Object.freeze(['≤ −75%', '−75 to −50%', '−50 to −20%', '−20 to +25%', '+25 to +100%', '+100 to +300%', '> +300%']);
+export const NEUTRAL_DIVERGING_CLASS = 3;
+
+export function divergingClassIndex(ratio) {
+  const classIndex = DIVERGING_RATIO_EDGES.findIndex((edge) => ratio < edge);
+  return classIndex === -1 ? DIVERGING_COLORS.length - 1 : classIndex;
+}
