@@ -23,10 +23,11 @@ export function createAreaAnalyzer(dataSource) {
       const predictions = samplesByUnit[index].map(model.predict);
       aggregateUnitIntoArea(unit, coverageByTile.get(unit.tileCounts.tileId), predictions, series);
     });
-    return describeAreaSeries(area, level, series);
+    const observationCoverage = areaObservationCoverage(tileCountsList, coverageByTile, recordWindow.monthCount);
+    return describeAreaSeries(area, level, series, observationCoverage);
   }
 
-  function describeAreaSeries(area, level, { modis, viirs, estimated }) {
+  function describeAreaSeries(area, level, { modis, viirs, estimated }, observationCoverage) {
     const lastCompleteMonth = recordWindow.lastMonthIndex - 1;
     const overlapMonths = [];
     for (let month = SENSOR_MILESTONES.viirsNoaa20Start; month <= lastCompleteMonth; month += 1) {
@@ -39,12 +40,25 @@ export function createAreaAnalyzer(dataSource) {
       recordWindow,
       modis,
       viirs,
+      observationCoverage,
       harmonization,
       ...harmonizedSeries(viirs, estimated, harmonization.logUncertainty),
     });
   }
 
   return { analyze };
+}
+
+function areaObservationCoverage(tileCountsList, coverageByTile, monthCount) {
+  const weighted = new Float64Array(monthCount);
+  let totalWeight = 0;
+  tileCountsList.forEach((tileCounts) => {
+    const fractions = coverageByTile.get(tileCounts.tileId);
+    const weight = tileCounts.cells.reduce((total, cell, index) => total + fractions[index] * cell.areaSquareKm * cell.landFraction, 0);
+    totalWeight += weight;
+    tileCounts.observationCoverage.forEach((coverage, month) => { weighted[month] += weight * coverage; });
+  });
+  return weighted.map((value) => (totalWeight > 0 ? value / totalWeight : 1));
 }
 
 function harmonizedSeries(viirs, estimated, logUncertainty) {
