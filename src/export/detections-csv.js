@@ -5,12 +5,12 @@ const FIRMS_COLUMNS = Object.freeze(['latitude', 'longitude', 'acq_date', 'acq_t
 const DEMO_COLUMN = 'demo_flag';
 const DEMO_VALUE = 'SYNTHETIC';
 
-export function buildDetectionsCsv(result, range) {
+export async function buildDetectionsCsv(result, range) {
   const rows = [];
   let isTruncated = false;
   const lastMonth = Math.min(range.lastMonthIndex, result.recordWindow.lastMonthIndex);
   for (let monthIndex = lastMonth; monthIndex >= range.firstMonthIndex && !isTruncated; monthIndex -= 1) {
-    const detections = result.detectionsForMonth(monthIndex);
+    const detections = await result.detectionsForMonth(monthIndex);
     const room = DETECTIONS_ROW_LIMIT - rows.length;
     rows.push(...detections.slice(0, room));
     isTruncated = detections.length > room;

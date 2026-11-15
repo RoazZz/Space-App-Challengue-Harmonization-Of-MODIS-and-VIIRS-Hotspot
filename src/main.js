@@ -4,6 +4,7 @@ import { defaultMapMonth } from './analysis/map-month.js';
 import { summarizePeriod } from './analysis/period-summary.js';
 import { APP_CONFIG } from './config.js';
 import { createBoundaryCatalog } from './data/boundary-catalog.js';
+import { loadFirmsDataSource } from './data/firms/firms-tile-data-source.js';
 import { loadLandArea } from './data/land-mask.js';
 import { createSimulatedFireDataSource } from './data/simulated/simulated-fire-data-source.js';
 import { createAreaLayer } from './map/area-layer.js';
@@ -38,6 +39,7 @@ import { createTooltip } from './ui/tooltip.js';
 
 const BOUNDARY_LOAD_ERROR = 'Boundaries could not be loaded. Check your connection and try again.';
 const ANALYSIS_ERROR = 'The harmonized series could not be calculated for this area.';
+const NO_FIRMS_DATA = 'No FIRMS data is published for this area yet — showing synthetic demo data.';
 const INVALID_COORDINATES = 'Enter a valid latitude (−90 to 90) and longitude (−180 to 180).';
 
 const leaflet = window.L;
@@ -98,9 +100,13 @@ const analysisView = createAnalysisView({
 });
 bindTabs({ buttons: allOf('[data-tab]'), panes: allOf('[data-tab-pane]'), onChange: tooltip.hide });
 const recordWindow = createRecordWindow();
-const dataSourceReady = loadLandArea(APP_CONFIG.landMaskPath).then((landArea) => createSimulatedFireDataSource({ landArea, recordWindow }));
-const analyzerReady = dataSourceReady.then(createAreaAnalyzer);
-dataSourceReady.then(({ isDemoData }) => showDemoNotices(isDemoData));
+const analyzersReady = Promise.all([
+  loadLandArea(APP_CONFIG.landMaskPath).then((landArea) => createSimulatedFireDataSource({ landArea, recordWindow })),
+  loadFirmsDataSource({ basePath: APP_CONFIG.firmsDataPath, recordWindow }).catch(() => null),
+]).then(([simulatedSource, firmsSource]) => ({
+  simulated: createAreaAnalyzer(simulatedSource),
+  firms: firmsSource ? { source: firmsSource, analyzer: createAreaAnalyzer(firmsSource) } : null,
+}));
 const analysisState = { result: null, summary: null, mapMonthIndex: null, baselineSettings: DEFAULT_BASELINE_SETTINGS };
 let latestAnalysisId = 0;
 
@@ -175,10 +181,11 @@ async function analyzeArea(area) {
   const analysisId = latestAnalysisId;
   analysisView.showLoading(area);
   try {
-    const analyzer = await analyzerReady;
+    const analyzer = chooseAnalyzer(await analyzersReady, area);
     await waitForPaint();
     const result = await analyzer.analyze(area);
     if (analysisId === latestAnalysisId) {
+      showDemoNotices(result.isDemoData);
       analysisState.result = result;
       analysisState.mapMonthIndex = defaultMapMonth(result, dateSection.currentRange());
       renderAnalysis();
@@ -186,6 +193,16 @@ async function analyzeArea(area) {
   } catch {
     toast.show(ANALYSIS_ERROR);
   }
+}
+
+function chooseAnalyzer({ simulated, firms }, area) {
+  if (firms?.source.covers(area.bounds)) {
+    return firms.analyzer;
+  }
+  if (firms) {
+    toast.show(NO_FIRMS_DATA, 5000);
+  }
+  return simulated;
 }
 
 function selectArea(area) {

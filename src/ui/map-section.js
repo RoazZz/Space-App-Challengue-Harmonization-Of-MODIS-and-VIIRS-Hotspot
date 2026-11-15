@@ -14,6 +14,7 @@ export function createMapSection({ elements, gridLayer, strataLayer, onMonthStep
     infoElement.textContent = monthInfo(result, monthIndex);
     gridLayer.show(result, monthIndex);
     strataLayer.show(result);
+    strataCheckbox.closest('label').hidden = result.strata.length < 2;
   }
 
   gridCheckbox.addEventListener('change', () => gridLayer.setVisible(gridCheckbox.checked));

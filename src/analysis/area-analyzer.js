@@ -42,8 +42,9 @@ export function createAreaAnalyzer(dataSource) {
       viirs,
       observationCoverage,
       cellGrid,
-      detectionsForMonth: (monthIndex) => cellGrid.coveredCellReferences
-        .flatMap(({ tileId, cellIndex }) => dataSource.listDetections(tileId, cellIndex, monthIndex))
+      detectionsForMonth: async (monthIndex) => (await Promise.all(cellGrid.coveredCellReferences
+        .map(({ tileId, cellIndex }) => dataSource.listDetections(tileId, cellIndex, monthIndex))))
+        .flat()
         .filter(({ latitude, longitude }) => area.contains(latitude, longitude)),
       strata: dataSource.strata,
       isDemoData: dataSource.isDemoData,

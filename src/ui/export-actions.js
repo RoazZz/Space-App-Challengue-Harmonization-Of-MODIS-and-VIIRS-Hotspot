@@ -14,7 +14,7 @@ export function bindExportActions({ detectionsButton, seriesButton, currentAnaly
     notify('Preparing the hotspots CSV…');
     await waitForPaint();
     const { result, summary } = analysis;
-    const { text, rowCount, isTruncated } = buildDetectionsCsv(result, summary.range);
+    const { text, rowCount, isTruncated } = await buildDetectionsCsv(result, summary.range);
     downloadTextFile(exportFileName('hotspots', result, summary.range), text);
     notify(isTruncated
       ? `Export capped at the ${formatInteger(DETECTIONS_ROW_LIMIT)} most recent hotspots. Narrow the area or dates for a full export.`
