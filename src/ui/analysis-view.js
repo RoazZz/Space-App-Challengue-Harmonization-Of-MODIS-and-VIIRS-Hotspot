@@ -7,7 +7,7 @@ import { createKpiCards } from './kpi-cards.js';
 import { renderLatestMonthLine } from './latest-month-line.js';
 import { createTimeSeriesTab } from './time-series-tab.js';
 
-export function createAnalysisView({ header, kpiContainer, latestMonthElement, tabsElement, calendarElements, timeSeriesElements, tooltip }) {
+export function createAnalysisView({ header, kpiContainer, latestMonthElement, tabsElement, calendarElements, timeSeriesElements, tooltip, onMonthSelected }) {
   const analysisHeader = createAnalysisHeader(header);
   const kpiCards = createKpiCards(kpiContainer);
   const timeSeriesTab = createTimeSeriesTab({ elements: timeSeriesElements, tooltip });
@@ -21,11 +21,11 @@ export function createAnalysisView({ header, kpiContainer, latestMonthElement, t
       tabsElement.hidden = true;
       tooltip.hide();
     },
-    show(result, summary) {
+    show(result, summary, selectedMonthIndex) {
       analysisHeader.show(result, summary);
       kpiCards.show(summary);
       renderLatestMonthLine(latestMonthElement, result, summary);
-      const { edges } = renderBurnCalendar({ container: chart, result, summary, tooltip });
+      const { edges } = renderBurnCalendar({ container: chart, result, summary, tooltip, selectedMonthIndex, onMonthSelected });
       renderBurnCalendarLegend(legend, edges, summary);
       footnote.textContent = calendarFootnote();
       timeSeriesTab.show(result, summary.range);

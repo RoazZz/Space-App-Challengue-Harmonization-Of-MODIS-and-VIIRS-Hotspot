@@ -1,0 +1,235 @@
+.demo-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+  color: #f5ec7a;
+  background: rgba(240, 228, 66, 0.08);
+  border: 1px solid rgba(240, 228, 66, 0.55);
+  border-radius: 999px;
+}
+
+.demo-badge i {
+  width: 7px;
+  height: 7px;
+  background: #f0e442;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #f0e442;
+}
+
+.demo-only {
+  display: none !important;
+}
+
+body.has-demo-data .demo-only {
+  display: revert !important;
+}
+
+body.has-demo-data .demo-badge {
+  display: flex !important;
+}
+
+.demo-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1100;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #f2ea86;
+  background: repeating-linear-gradient(135deg, #2a2608 0 12px, #232006 12px 24px);
+  border-top: 1px solid rgba(240, 228, 66, 0.4);
+}
+
+body.has-demo-data .demo-strip {
+  display: flex !important;
+}
+
+body.has-demo-data .map-controls {
+  bottom: 42px;
+}
+
+body.has-demo-data .leaflet-bottom {
+  bottom: 30px;
+}
+
+body.has-demo-data .panel {
+  max-height: calc(100% - 66px - 42px);
+}
+
+.dialog {
+  width: min(640px, 92vw);
+  max-height: 86vh;
+  padding: 22px 24px;
+  overflow: auto;
+  line-height: 1.5;
+  color: var(--text);
+  background: #121820;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.dialog::backdrop {
+  background: rgba(3, 6, 9, 0.72);
+}
+
+.dialog h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+
+.dialog ul {
+  margin: 6px 0 14px;
+  padding-left: 18px;
+  color: #d3dbe3;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.dialog-lead {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+
+.dialog-demo {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: #f2ea86;
+  background: rgba(240, 228, 66, 0.07);
+  border: 1px solid rgba(240, 228, 66, 0.5);
+  border-radius: 9px;
+}
+
+.dialog-actions {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.button.primary {
+  color: #1a0d06;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.source-card {
+  margin-bottom: 8px;
+  padding: 10px 11px;
+  background: var(--field-background);
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+}
+
+.source-title {
+  margin-bottom: 9px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.source-bar {
+  display: flex;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.source-estimated,
+.source-legend-item.estimated::before {
+  background: repeating-linear-gradient(90deg, #f0e442 0 6px, rgba(240, 228, 66, 0.25) 6px 9px);
+}
+
+.source-observed,
+.source-legend-item.observed::before {
+  background: #f0e442;
+}
+
+.source-observed {
+  margin-left: 2px;
+}
+
+.source-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #5f6c79;
+}
+
+.source-legend-item {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.source-legend-item::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 6px;
+  margin-right: 6px;
+  vertical-align: 1px;
+  border-radius: 3px;
+}
+
+.source-description {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  font-size: 11.8px;
+  color: #cdd6df;
+  background: #11171d;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.notice b {
+  color: #fff;
+}
+
+.notice-icon {
+  display: grid;
+  flex: 0 0 20px;
+  place-items: center;
+  height: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 50%;
+}
+
+.notice-info {
+  color: #56b4e9;
+  background: rgba(86, 180, 233, 0.15);
+}
+
+.notice-warning {
+  color: #e9a93a;
+  background: rgba(233, 169, 58, 0.15);
+}
+
+.notice-confidence {
+  color: var(--accent);
+  background: rgba(255, 107, 53, 0.15);
+}

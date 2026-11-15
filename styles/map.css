@@ -85,3 +85,20 @@ body.panels-hidden .map-controls {
   background: #151b22 !important;
   border-color: #2a333d !important;
 }
+
+.info-button {
+  width: 40px;
+  height: 40px;
+  font: italic 700 18px Georgia, serif;
+  color: #e8eef4;
+  cursor: pointer;
+  background: #151b22;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+.info-button:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}

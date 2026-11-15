@@ -1,5 +1,6 @@
 import { createAreaAnalyzer } from './analysis/area-analyzer.js';
 import { DEFAULT_BASELINE_SETTINGS } from './analysis/baseline.js';
+import { defaultMapMonth } from './analysis/map-month.js';
 import { summarizePeriod } from './analysis/period-summary.js';
 import { APP_CONFIG } from './config.js';
 import { createBoundaryCatalog } from './data/boundary-catalog.js';
@@ -7,10 +8,14 @@ import { loadLandArea } from './data/land-mask.js';
 import { createSimulatedFireDataSource } from './data/simulated/simulated-fire-data-source.js';
 import { createAreaLayer } from './map/area-layer.js';
 import { createBaseLayers } from './map/base-layers.js';
+import { createHarmonizedGridLayer } from './map/harmonized-grid-layer.js';
 import { createMap } from './map/map-view.js';
 import { createPointPicking } from './map/point-picking.js';
 import { createPolygonDrawing } from './map/polygon-drawing.js';
 import { createRectangleDrawing } from './map/rectangle-drawing.js';
+import { createStrataLayer } from './map/strata-layer.js';
+import { contains } from './time/date-range.js';
+import { monthLabel } from './time/month-index.js';
 import { createRecordWindow } from './time/record-window.js';
 import { createAnalysisView } from './ui/analysis-view.js';
 import { createAreaSection } from './ui/area-section.js';
@@ -19,6 +24,10 @@ import { bindBaseLayerPicker } from './ui/base-layer-picker.js';
 import { createCircleForm } from './ui/circle-form.js';
 import { trackCursorCoordinates } from './ui/cursor-coordinates.js';
 import { createDateSection } from './ui/date-section.js';
+import { showDemoNotices } from './ui/demo-notice.js';
+import { bindDialog } from './ui/dialogs.js';
+import { renderInterpretationNotices } from './ui/interpretation-notices.js';
+import { createMapSection } from './ui/map-section.js';
 import { bindPanelVisibility } from './ui/panel-visibility.js';
 import { waitForPaint } from './ui/paint.js';
 import { createPresetPicker } from './ui/preset-picker.js';
@@ -66,13 +75,45 @@ const analysisView = createAnalysisView({
     footnote: byId('time-series-footnote'),
   },
   tooltip,
+  onMonthSelected: (monthIndex) => {
+    showMapMonth(monthIndex);
+    toast.show(`Map now shows ${monthLabel(monthIndex)}.`);
+  },
 });
 bindTabs({ buttons: allOf('[data-tab]'), panes: allOf('[data-tab-pane]'), onChange: tooltip.hide });
 const recordWindow = createRecordWindow();
-const analyzerReady = loadLandArea(APP_CONFIG.landMaskPath).then((landArea) =>
-  createAreaAnalyzer(createSimulatedFireDataSource({ landArea, recordWindow })));
-const analysisState = { result: null };
+const dataSourceReady = loadLandArea(APP_CONFIG.landMaskPath).then((landArea) => createSimulatedFireDataSource({ landArea, recordWindow }));
+const analyzerReady = dataSourceReady.then(createAreaAnalyzer);
+dataSourceReady.then(({ isDemoData }) => showDemoNotices(isDemoData));
+const analysisState = { result: null, mapMonthIndex: null };
 let latestAnalysisId = 0;
+
+const mapSection = createMapSection({
+  elements: {
+    gridCheckbox: byId('grid-layer-toggle'),
+    strataCheckbox: byId('strata-layer-toggle'),
+    previousButton: byId('map-month-previous'),
+    nextButton: byId('map-month-next'),
+    monthElement: byId('map-month-label'),
+    infoElement: byId('map-month-info'),
+    legendElement: byId('density-legend'),
+  },
+  gridLayer: createHarmonizedGridLayer(leaflet, map),
+  strataLayer: createStrataLayer(leaflet, map),
+  onMonthStep: (step) => showMapMonth(analysisState.mapMonthIndex + step),
+});
+const interpretationNotices = byId('interpretation-notices');
+bindDialog({
+  dialog: byId('interpretation-dialog'),
+  openButtons: [byId('info-button')],
+  closeButtons: allOf('#interpretation-dialog [data-close-dialog]'),
+  onOpen: () => analysisState.result && renderInterpretationNotices(interpretationNotices, analysisState.result),
+});
+const aboutDialog = bindDialog({
+  dialog: byId('about-dialog'),
+  openButtons: [byId('about-button')],
+  closeButtons: allOf('#about-dialog [data-close-dialog]'),
+});
 
 const dateSection = createDateSection({
   elements: {
@@ -88,9 +129,22 @@ const dateSection = createDateSection({
 });
 
 function renderAnalysis() {
-  if (analysisState.result) {
-    analysisView.show(analysisState.result, summarizePeriod(analysisState.result, dateSection.currentRange(), DEFAULT_BASELINE_SETTINGS));
+  const { result } = analysisState;
+  if (!result) {
+    return;
   }
+  const range = dateSection.currentRange();
+  if (!contains(range, analysisState.mapMonthIndex)) {
+    analysisState.mapMonthIndex = defaultMapMonth(result, range);
+  }
+  analysisView.show(result, summarizePeriod(result, range, DEFAULT_BASELINE_SETTINGS), analysisState.mapMonthIndex);
+  mapSection.show(result, analysisState.mapMonthIndex);
+}
+
+function showMapMonth(monthIndex) {
+  const range = dateSection.currentRange();
+  analysisState.mapMonthIndex = Math.max(range.firstMonthIndex, Math.min(range.lastMonthIndex, monthIndex));
+  renderAnalysis();
 }
 
 async function analyzeArea(area) {
@@ -103,6 +157,7 @@ async function analyzeArea(area) {
     const result = await analyzer.analyze(area);
     if (analysisId === latestAnalysisId) {
       analysisState.result = result;
+      analysisState.mapMonthIndex = defaultMapMonth(result, dateSection.currentRange());
       renderAnalysis();
     }
   } catch {
@@ -165,3 +220,4 @@ document.addEventListener('keydown', (event) => {
 });
 
 areaSection.initialize();
+aboutDialog.open();

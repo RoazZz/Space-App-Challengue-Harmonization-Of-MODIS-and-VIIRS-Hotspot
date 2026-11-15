@@ -190,8 +190,8 @@
   border-radius: 2px;
 }
 
-.calendar-cell {
-  cursor: default;
+.calendar-cell.is-selectable {
+  cursor: pointer;
 }
 
 .calendar-cell:hover {

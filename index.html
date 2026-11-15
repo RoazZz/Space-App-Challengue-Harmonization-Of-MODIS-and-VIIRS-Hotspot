@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="styles/controls.css">
   <link rel="stylesheet" href="styles/map.css">
   <link rel="stylesheet" href="styles/analysis.css">
+  <link rel="stylesheet" href="styles/dialogs.css">
 </head>
 <body>
   <div id="map"></div>
@@ -27,8 +28,10 @@
         <div class="brand-tagline">Harmonized MODIS + VIIRS hotspot calendar</div>
       </div>
     </div>
+    <div class="demo-badge demo-only" title="All values on this page are synthetic and generated in your browser."><i></i>DEMO DATA · SYNTHETIC</div>
     <div class="spacer"></div>
     <div class="cursor-coordinates" id="cursor-coordinates">Lat —  ·  Lon —</div>
+    <button class="top-bar-button" id="about-button" type="button">About</button>
     <button class="top-bar-button" id="panel-visibility-button" type="button">Hide panels</button>
   </header>
 
@@ -89,6 +92,20 @@
         <button class="chip" type="button" data-range-shortcut="lastFiveYears">Last 5 years</button>
       </div>
     </section>
+
+    <section class="panel-section">
+      <h2 class="section-heading"><span class="section-number">3</span>Map</h2>
+      <label class="checkbox"><input type="checkbox" id="grid-layer-toggle" checked><span class="layer-swatch grid-swatch"></span>Harmonized activity grid</label>
+      <label class="checkbox"><input type="checkbox" id="strata-layer-toggle"><span class="layer-swatch strata-swatch"></span>Biome strata<span class="demo-only">&nbsp;(demo)</span></label>
+      <div class="month-navigator">
+        <button class="button" id="map-month-previous" type="button" title="Previous month" aria-label="Previous month">◀</button>
+        <div class="month-navigator-label" id="map-month-label">—</div>
+        <button class="button" id="map-month-next" type="button" title="Next month" aria-label="Next month">▶</button>
+      </div>
+      <div class="small-text spaced-field">VIIRS-equivalent detections per 100 km² per month</div>
+      <div class="color-ramp density-ramp" id="density-legend"></div>
+      <div class="small-text spaced-field" id="map-month-info"></div>
+    </section>
   </aside>
 
   <section class="panel analysis-panel" aria-live="polite">
@@ -131,9 +148,32 @@
   </section>
 
   <div class="map-controls">
+    <button class="info-button" id="info-button" type="button" title="Read before interpreting" aria-label="Read before interpreting">i</button>
     <button class="base-layer-thumbnail dark-thumbnail is-selected" type="button" data-base-layer="dark" title="Dark basemap"><span>Dark</span></button>
     <button class="base-layer-thumbnail satellite-thumbnail" type="button" data-base-layer="satellite" title="Satellite basemap"><span>Satellite</span></button>
   </div>
+
+  <div class="demo-strip demo-only">⚠ Demo version · all values are synthetic, generated in your browser · not real fire observations</div>
+
+  <dialog class="dialog" id="interpretation-dialog">
+    <div class="dialog-header"><h2>Read before interpreting</h2><button class="top-bar-button" type="button" data-close-dialog>Close</button></div>
+    <div id="interpretation-notices"></div>
+  </dialog>
+
+  <dialog class="dialog" id="about-dialog">
+    <h2>EmberSpotter</h2>
+    <p class="dialog-lead">A harmonized burning-activity calendar that joins the long MODIS hotspot record (2001 →) with the more detailed VIIRS NOAA-20 record (Apr 2018 →) in one consistent monthly series for any area of the world, for land and forest managers planning burn seasons and prevention.</p>
+    <div class="dialog-demo demo-only"><b>Demo data.</b> Every number, map cell and model metric on this page is synthetic and generated in your browser with a fixed random seed. The data layout follows the real active-fire attributes so the screens can be validated, but nothing here describes real fires.</div>
+    <b>How to use</b>
+    <ul>
+      <li>Choose an <b>area of interest</b> (a country or one of its states or provinces, a rectangle, a polygon or lat/lon + radius) and a <b>date range</b>.</li>
+      <li>All charts use one <b>harmonized</b> series: estimated from MODIS before Apr 2018 and observed VIIRS NOAA-20 after. The map shows a harmonized activity grid; raw sensor counts appear only as reference (tooltips and <i>Time series → Raw sources</i>).</li>
+      <li>Read the <b>burn calendar</b> and check the <b>time series</b> before and after harmonization.</li>
+    </ul>
+    <p>Before drawing conclusions, open <b>Read before interpreting</b> with the <b>i</b> button at the bottom-left of the map: it explains what a hotspot is, gaps from clouds, and how much to trust the harmonized values for your area.</p>
+    <p class="small-text">Planned data source for the real build: NASA FIRMS active fire data (MODIS Collection 6.1 standard product and VIIRS NOAA-20 375 m).</p>
+    <div class="dialog-actions"><button class="button primary" type="button" data-close-dialog>Got it — explore EmberSpotter</button></div>
+  </dialog>
 
   <div class="toast" id="toast" role="status"></div>
   <div class="tooltip" id="tooltip" hidden></div>
