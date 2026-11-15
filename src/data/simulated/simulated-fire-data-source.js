@@ -4,6 +4,7 @@ import { MONTHS_PER_YEAR } from '../../time/month-index.js';
 import { activityDensity, circularMonthDistance, seasonPeakMonth } from './fire-activity-model.js';
 import { createRandom, approximateGaussian, hashIntegers } from './seeded-random.js';
 import { createCountArrays, writeCellCounts } from './simulated-cell-counts.js';
+import { simulateDetections } from './simulated-detections.js';
 import { stratumAt, SYNTHETIC_STRATA } from './synthetic-strata.js';
 
 const DEFAULT_SEED = 20261114;
@@ -20,9 +21,16 @@ export function createSimulatedFireDataSource({ landArea, recordWindow, seed = D
 
   function loadTileCounts(tile) {
     if (!tileCache.has(tile.id)) {
-      tileCache.set(tile.id, Promise.resolve(buildTileCounts(tile)));
+      tileCache.set(tile.id, buildTileCounts(tile));
     }
-    return tileCache.get(tile.id);
+    return Promise.resolve(tileCache.get(tile.id));
+  }
+
+  function listDetections(tileId, cellIndex, monthIndex) {
+    const { cells, counts, monthCount } = tileCache.get(tileId);
+    const index = cellIndex * monthCount + monthIndex;
+    const totals = Object.fromEntries(Object.entries(counts).map(([series, values]) => [series, values[index]]));
+    return simulateDetections({ cell: cells[cellIndex], totals, monthIndex, recordWindow, seed });
   }
 
   function buildTileCounts(tile) {
@@ -42,7 +50,7 @@ export function createSimulatedFireDataSource({ landArea, recordWindow, seed = D
     return Object.freeze({ tileId: tile.id, monthCount: recordWindow.monthCount, cells: cells.map(toPublicCell), counts, observationCoverage });
   }
 
-  return { recordWindow, strata: SYNTHETIC_STRATA, isDemoData: true, loadTileCounts };
+  return { recordWindow, strata: SYNTHETIC_STRATA, isDemoData: true, loadTileCounts, listDetections };
 }
 
 function landCellsOf(tile, landArea) {
