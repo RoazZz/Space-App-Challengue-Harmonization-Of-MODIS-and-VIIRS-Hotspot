@@ -4,7 +4,7 @@ import { join } from 'node:path';
 const API_ROOT = 'https://firms.modaps.eosdis.nasa.gov/api';
 const DAYS_PER_REQUEST = 5;
 const REQUEST_SPACING_MS = 650;
-const PARALLEL_REQUESTS = 3;
+const PARALLEL_REQUESTS = 10;
 const RETRY_DELAYS_MS = Object.freeze([5000, 30000, 90000]);
 const MILLISECONDS_PER_DAY = 86400000;
 const SENSOR_PLANS = Object.freeze([
