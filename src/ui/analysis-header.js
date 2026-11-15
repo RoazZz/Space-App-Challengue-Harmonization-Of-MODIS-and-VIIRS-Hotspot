@@ -18,9 +18,10 @@ export function createAnalysisHeader({ titleElement, subtitleElement, confidence
     confidenceElement.hidden = true;
   }
 
-  function show({ area, recordWindow, harmonization }) {
+  function show({ area, recordWindow, harmonization }, { range }) {
     renderTitle(area.name);
-    subtitleElement.textContent = `${monthLabel(recordWindow.firstMonthIndex)} – ${monthLabel(recordWindow.lastMonthIndex)} (partial) · monthly · VIIRS-equivalent detections`;
+    const partialNote = range.lastMonthIndex === recordWindow.lastMonthIndex ? ' (partial)' : '';
+    subtitleElement.textContent = `${monthLabel(range.firstMonthIndex)} – ${monthLabel(range.lastMonthIndex)}${partialNote} · monthly · VIIRS-equivalent detections`;
     renderConfidence(harmonization, recordWindow);
   }
 

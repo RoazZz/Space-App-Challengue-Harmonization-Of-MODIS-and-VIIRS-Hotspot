@@ -74,6 +74,21 @@
 
       <div class="area-summary" id="area-summary" aria-live="polite"></div>
     </section>
+
+    <section class="panel-section">
+      <h2 class="section-heading"><span class="section-number">2</span>Date range</h2>
+      <div class="field">From
+        <div class="field-row"><select id="range-from-month" aria-label="From month"></select><select id="range-from-year" aria-label="From year"></select></div>
+      </div>
+      <div class="field spaced-field">To
+        <div class="field-row"><select id="range-to-month" aria-label="To month"></select><select id="range-to-year" aria-label="To year"></select></div>
+      </div>
+      <div class="chips">
+        <button class="chip" type="button" data-range-shortcut="fullRecord">Full record</button>
+        <button class="chip" type="button" data-range-shortcut="overlap" id="overlap-shortcut">Overlap</button>
+        <button class="chip" type="button" data-range-shortcut="lastFiveYears">Last 5 years</button>
+      </div>
+    </section>
   </aside>
 
   <section class="panel analysis-panel" aria-live="polite">
@@ -85,6 +100,13 @@
       <span class="confidence-pill" id="confidence-pill" hidden></span>
     </div>
     <div class="kpi-grid" id="kpi-grid"></div>
+    <div class="latest-month" id="latest-month"></div>
+    <div class="calendar-section" id="calendar-section" hidden>
+      <h3 class="tab-title">Burn calendar</h3>
+      <div id="calendar-chart"></div>
+      <div id="calendar-legend"></div>
+      <p class="footnote" id="calendar-footnote"></p>
+    </div>
   </section>
 
   <div class="map-controls">
@@ -93,6 +115,7 @@
   </div>
 
   <div class="toast" id="toast" role="status"></div>
+  <div class="tooltip" id="tooltip" hidden></div>
 
   <script src="vendor/leaflet/leaflet.js"></script>
   <script type="module" src="src/main.js"></script>

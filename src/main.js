@@ -1,4 +1,6 @@
 import { createAreaAnalyzer } from './analysis/area-analyzer.js';
+import { DEFAULT_BASELINE_SETTINGS } from './analysis/baseline.js';
+import { summarizePeriod } from './analysis/period-summary.js';
 import { APP_CONFIG } from './config.js';
 import { createBoundaryCatalog } from './data/boundary-catalog.js';
 import { loadLandArea } from './data/land-mask.js';
@@ -16,10 +18,12 @@ import { createAreaSummary } from './ui/area-summary.js';
 import { bindBaseLayerPicker } from './ui/base-layer-picker.js';
 import { createCircleForm } from './ui/circle-form.js';
 import { trackCursorCoordinates } from './ui/cursor-coordinates.js';
+import { createDateSection } from './ui/date-section.js';
 import { bindPanelVisibility } from './ui/panel-visibility.js';
 import { waitForPaint } from './ui/paint.js';
 import { createPresetPicker } from './ui/preset-picker.js';
 import { createToast } from './ui/toast.js';
+import { createTooltip } from './ui/tooltip.js';
 
 const BOUNDARY_LOAD_ERROR = 'Boundaries could not be loaded. Check your connection and try again.';
 const ANALYSIS_ERROR = 'The harmonized series could not be calculated for this area.';
@@ -38,14 +42,45 @@ const panelVisibility = bindPanelVisibility(byId('panel-visibility-button'), map
 const areaLayer = createAreaLayer(leaflet, map);
 const areaSummary = createAreaSummary(byId('area-summary'));
 const analysisView = createAnalysisView({
-  titleElement: byId('analysis-title'),
-  subtitleElement: byId('analysis-subtitle'),
-  confidenceElement: byId('confidence-pill'),
+  header: {
+    titleElement: byId('analysis-title'),
+    subtitleElement: byId('analysis-subtitle'),
+    confidenceElement: byId('confidence-pill'),
+  },
   kpiContainer: byId('kpi-grid'),
+  latestMonthElement: byId('latest-month'),
+  calendarElements: {
+    section: byId('calendar-section'),
+    chart: byId('calendar-chart'),
+    legend: byId('calendar-legend'),
+    footnote: byId('calendar-footnote'),
+  },
+  tooltip: createTooltip(byId('tooltip')),
 });
+const recordWindow = createRecordWindow();
 const analyzerReady = loadLandArea(APP_CONFIG.landMaskPath).then((landArea) =>
-  createAreaAnalyzer(createSimulatedFireDataSource({ landArea, recordWindow: createRecordWindow() })));
+  createAreaAnalyzer(createSimulatedFireDataSource({ landArea, recordWindow })));
+const analysisState = { result: null };
 let latestAnalysisId = 0;
+
+const dateSection = createDateSection({
+  elements: {
+    fromMonth: byId('range-from-month'),
+    fromYear: byId('range-from-year'),
+    toMonth: byId('range-to-month'),
+    toYear: byId('range-to-year'),
+    shortcutButtons: allOf('[data-range-shortcut]'),
+  },
+  recordWindow,
+  onRangeChanged: renderAnalysis,
+  notify: (message) => toast.show(message),
+});
+
+function renderAnalysis() {
+  if (analysisState.result) {
+    analysisView.show(analysisState.result, summarizePeriod(analysisState.result, dateSection.currentRange(), DEFAULT_BASELINE_SETTINGS));
+  }
+}
 
 async function analyzeArea(area) {
   latestAnalysisId += 1;
@@ -56,7 +91,8 @@ async function analyzeArea(area) {
     await waitForPaint();
     const result = await analyzer.analyze(area);
     if (analysisId === latestAnalysisId) {
-      analysisView.show(result);
+      analysisState.result = result;
+      renderAnalysis();
     }
   } catch {
     toast.show(ANALYSIS_ERROR);

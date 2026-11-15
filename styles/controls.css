@@ -84,8 +84,35 @@
 }
 
 .field input,
-.field select {
+.field select,
+.field .field-row {
   margin-top: 3px;
+}
+
+.field .field-row select {
+  margin-top: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.chip {
+  padding: 4px 9px;
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+}
+
+.chip:hover {
+  color: #fff;
+  border-color: #566474;
 }
 
 .spaced-field {
