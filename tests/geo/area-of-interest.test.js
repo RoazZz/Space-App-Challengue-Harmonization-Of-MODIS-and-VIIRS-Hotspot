@@ -36,7 +36,7 @@ test('country areas match their reference surface within the map generalization'
 });
 
 test('countries split by the antimeridian get narrow bounds and aligned parts', () => {
-  for (const countryId of ['fiji', 'russia']) {
+  for (const countryId of ['fiji', 'russian-federation']) {
     const country = loadCountry(countryId);
     const area = createPolygonArea(country.name, country.polygons);
     assert.ok(area.bounds.east - area.bounds.west < 200, countryId);
