@@ -5,18 +5,20 @@ import { monthLabel, RECORD_START_YEAR, monthIndexOf } from '../time/month-index
 import { createAnalysisHeader } from './analysis-header.js';
 import { createKpiCards } from './kpi-cards.js';
 import { renderLatestMonthLine } from './latest-month-line.js';
+import { createTimeSeriesTab } from './time-series-tab.js';
 
-export function createAnalysisView({ header, kpiContainer, latestMonthElement, calendarElements, tooltip }) {
+export function createAnalysisView({ header, kpiContainer, latestMonthElement, tabsElement, calendarElements, timeSeriesElements, tooltip }) {
   const analysisHeader = createAnalysisHeader(header);
   const kpiCards = createKpiCards(kpiContainer);
-  const { chart, legend, footnote, section } = calendarElements;
+  const timeSeriesTab = createTimeSeriesTab({ elements: timeSeriesElements, tooltip });
+  const { chart, legend, footnote } = calendarElements;
 
   return {
     showLoading(area) {
       analysisHeader.showLoading(area);
       kpiCards.clear();
       latestMonthElement.replaceChildren();
-      section.hidden = true;
+      tabsElement.hidden = true;
       tooltip.hide();
     },
     show(result, summary) {
@@ -26,7 +28,8 @@ export function createAnalysisView({ header, kpiContainer, latestMonthElement, c
       const { edges } = renderBurnCalendar({ container: chart, result, summary, tooltip });
       renderBurnCalendarLegend(legend, edges, summary);
       footnote.textContent = calendarFootnote();
-      section.hidden = false;
+      timeSeriesTab.show(result, summary.range);
+      tabsElement.hidden = false;
     },
   };
 }

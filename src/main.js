@@ -22,6 +22,7 @@ import { createDateSection } from './ui/date-section.js';
 import { bindPanelVisibility } from './ui/panel-visibility.js';
 import { waitForPaint } from './ui/paint.js';
 import { createPresetPicker } from './ui/preset-picker.js';
+import { bindTabs } from './ui/tabs.js';
 import { createToast } from './ui/toast.js';
 import { createTooltip } from './ui/tooltip.js';
 
@@ -41,6 +42,7 @@ const toast = createToast(byId('toast'));
 const panelVisibility = bindPanelVisibility(byId('panel-visibility-button'), map);
 const areaLayer = createAreaLayer(leaflet, map);
 const areaSummary = createAreaSummary(byId('area-summary'));
+const tooltip = createTooltip(byId('tooltip'));
 const analysisView = createAnalysisView({
   header: {
     titleElement: byId('analysis-title'),
@@ -49,14 +51,23 @@ const analysisView = createAnalysisView({
   },
   kpiContainer: byId('kpi-grid'),
   latestMonthElement: byId('latest-month'),
+  tabsElement: byId('analysis-tabs'),
   calendarElements: {
-    section: byId('calendar-section'),
     chart: byId('calendar-chart'),
     legend: byId('calendar-legend'),
     footnote: byId('calendar-footnote'),
   },
-  tooltip: createTooltip(byId('tooltip')),
+  timeSeriesElements: {
+    modeButtons: allOf('[data-time-series-mode]'),
+    aggregationButtons: allOf('[data-time-series-aggregation]'),
+    logScaleInput: byId('time-series-log-scale'),
+    chart: byId('time-series-chart'),
+    legend: byId('time-series-legend'),
+    footnote: byId('time-series-footnote'),
+  },
+  tooltip,
 });
+bindTabs({ buttons: allOf('[data-tab]'), panes: allOf('[data-tab-pane]'), onChange: tooltip.hide });
 const recordWindow = createRecordWindow();
 const analyzerReady = loadLandArea(APP_CONFIG.landMaskPath).then((landArea) =>
   createAreaAnalyzer(createSimulatedFireDataSource({ landArea, recordWindow })));

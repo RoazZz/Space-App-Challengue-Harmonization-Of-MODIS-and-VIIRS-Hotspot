@@ -101,11 +101,32 @@
     </div>
     <div class="kpi-grid" id="kpi-grid"></div>
     <div class="latest-month" id="latest-month"></div>
-    <div class="calendar-section" id="calendar-section" hidden>
-      <h3 class="tab-title">Burn calendar</h3>
-      <div id="calendar-chart"></div>
-      <div id="calendar-legend"></div>
-      <p class="footnote" id="calendar-footnote"></p>
+    <div class="analysis-tabs" id="analysis-tabs" hidden>
+      <div class="tab-bar">
+        <button type="button" data-tab="calendar" class="is-selected">Burn calendar</button>
+        <button type="button" data-tab="time-series">Time series</button>
+      </div>
+      <div class="tab-pane" data-tab-pane="calendar">
+        <div id="calendar-chart"></div>
+        <div id="calendar-legend"></div>
+        <p class="footnote" id="calendar-footnote"></p>
+      </div>
+      <div class="tab-pane" data-tab-pane="time-series" hidden>
+        <div class="chart-tools">
+          <div class="segmented-control compact">
+            <button type="button" data-time-series-mode="raw">Raw sources</button>
+            <button type="button" data-time-series-mode="harmonized" class="is-selected">Harmonized</button>
+          </div>
+          <div class="segmented-control compact">
+            <button type="button" data-time-series-aggregation="monthly" class="is-selected">Monthly</button>
+            <button type="button" data-time-series-aggregation="annual">Annual</button>
+          </div>
+          <label class="checkbox"><input type="checkbox" id="time-series-log-scale">Log scale</label>
+        </div>
+        <div id="time-series-chart"></div>
+        <div class="legend" id="time-series-legend"></div>
+        <p class="footnote" id="time-series-footnote"></p>
+      </div>
     </div>
   </section>
 
