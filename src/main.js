@@ -26,6 +26,7 @@ import { trackCursorCoordinates } from './ui/cursor-coordinates.js';
 import { createDateSection } from './ui/date-section.js';
 import { showDemoNotices } from './ui/demo-notice.js';
 import { bindDialog } from './ui/dialogs.js';
+import { bindExportActions } from './ui/export-actions.js';
 import { renderInterpretationNotices } from './ui/interpretation-notices.js';
 import { createMapSection } from './ui/map-section.js';
 import { bindPanelVisibility } from './ui/panel-visibility.js';
@@ -100,7 +101,7 @@ const recordWindow = createRecordWindow();
 const dataSourceReady = loadLandArea(APP_CONFIG.landMaskPath).then((landArea) => createSimulatedFireDataSource({ landArea, recordWindow }));
 const analyzerReady = dataSourceReady.then(createAreaAnalyzer);
 dataSourceReady.then(({ isDemoData }) => showDemoNotices(isDemoData));
-const analysisState = { result: null, mapMonthIndex: null, baselineSettings: DEFAULT_BASELINE_SETTINGS };
+const analysisState = { result: null, summary: null, mapMonthIndex: null, baselineSettings: DEFAULT_BASELINE_SETTINGS };
 let latestAnalysisId = 0;
 
 const mapSection = createMapSection({
@@ -116,6 +117,12 @@ const mapSection = createMapSection({
   gridLayer: createHarmonizedGridLayer(leaflet, map),
   strataLayer: createStrataLayer(leaflet, map),
   onMonthStep: (step) => showMapMonth(analysisState.mapMonthIndex + step),
+});
+bindExportActions({
+  detectionsButton: byId('export-detections-button'),
+  seriesButton: byId('export-series-button'),
+  currentAnalysis: () => (analysisState.result ? { result: analysisState.result, summary: analysisState.summary } : null),
+  notify: (message) => toast.show(message, 5000),
 });
 const interpretationNotices = byId('interpretation-notices');
 bindDialog({
@@ -152,7 +159,8 @@ function renderAnalysis() {
   if (!contains(range, analysisState.mapMonthIndex)) {
     analysisState.mapMonthIndex = defaultMapMonth(result, range);
   }
-  analysisView.show(result, summarizePeriod(result, range, analysisState.baselineSettings), analysisState.mapMonthIndex);
+  analysisState.summary = summarizePeriod(result, range, analysisState.baselineSettings);
+  analysisView.show(result, analysisState.summary, analysisState.mapMonthIndex);
   mapSection.show(result, analysisState.mapMonthIndex);
 }
 
