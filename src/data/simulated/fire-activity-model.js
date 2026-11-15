@@ -9,6 +9,9 @@ const BASE_DENSITY_PER_SQUARE_KM = 0.006;
 const CLUSTER_SCALE_DEGREES = 3;
 const CLUSTER_GAIN = 3;
 const PEAK_JITTER_MONTHS = 1.5;
+const DRY_SEASON_LATITUDE_LIMIT = 30;
+const DRY_SEASON_PEAK_MONTH = 3.2;
+const SUMMER_PEAK_MONTH = 7;
 
 export function activityDensity(latitude, longitude, stratum, seed) {
   if (latitude < FIRE_LATITUDE_RANGE.south || latitude > FIRE_LATITUDE_RANGE.north) {
@@ -19,7 +22,7 @@ export function activityDensity(latitude, longitude, stratum, seed) {
 }
 
 export function seasonPeakMonth(latitude, longitude, seed) {
-  const northernPeak = Math.abs(latitude) < 23 ? 2.5 : 7;
+  const northernPeak = Math.abs(latitude) < DRY_SEASON_LATITUDE_LIMIT ? DRY_SEASON_PEAK_MONTH : SUMMER_PEAK_MONTH;
   const hemispherePeak = latitude >= 0 ? northernPeak : northernPeak + HALF_YEAR_MONTHS;
   const jitter = (valueNoise(latitude, longitude, CLUSTER_SCALE_DEGREES, seed + 4) - 0.5) * 2 * PEAK_JITTER_MONTHS;
   return (hemispherePeak + jitter + MONTHS_PER_YEAR) % MONTHS_PER_YEAR;
