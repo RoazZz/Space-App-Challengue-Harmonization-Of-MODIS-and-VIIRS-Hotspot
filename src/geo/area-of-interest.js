@@ -1,5 +1,6 @@
 import { alignPolygons } from './aligned-polygons.js';
 import { EARTH_RADIUS_KM, polygonAreaSquareKm, sphericalCapAreaSquareKm } from './geodesic-area.js';
+import { isInsideIntervals } from './interval-membership.js';
 import { createLatitudeScanner } from './latitude-crossings.js';
 import { normalizeLongitude } from './longitude.js';
 import { WHOLE_WORLD_SPAN } from './longitude-span.js';
@@ -12,12 +13,14 @@ const toRadians = (degrees) => (degrees * Math.PI) / 180;
 export function createPolygonArea(name, polygons) {
   const { polygons: alignedPolygons, longitudeSpan } = alignPolygons(polygons);
   const latitudes = alignedPolygons.flatMap(([outerRing]) => outerRing.map(([, latitude]) => latitude));
+  const longitudeIntervalsAt = createLatitudeScanner(alignedPolygons);
   return Object.freeze({
     name,
     shape: { type: AREA_SHAPE.POLYGONS, polygons: alignedPolygons },
     areaSquareKm: alignedPolygons.reduce((total, polygon) => total + polygonAreaSquareKm(polygon), 0),
     bounds: { south: Math.min(...latitudes), north: Math.max(...latitudes), ...longitudeSpan },
-    longitudeIntervalsAt: createLatitudeScanner(alignedPolygons),
+    longitudeIntervalsAt,
+    contains: (latitude, longitude) => isInsideIntervals(longitude, longitudeIntervalsAt(latitude)),
   });
 }
 
@@ -34,6 +37,7 @@ export function createCircleArea(name, { latitude, longitude }, radiusKm) {
     areaSquareKm: sphericalCapAreaSquareKm(radiusKm),
     bounds: circleBounds(center, radiusKm),
     longitudeIntervalsAt: (latitude) => circleIntervalsAtLatitude(center, radiusKm, latitude),
+    contains: (latitude, longitude) => isInsideIntervals(longitude, circleIntervalsAtLatitude(center, radiusKm, latitude)),
   });
 }
 

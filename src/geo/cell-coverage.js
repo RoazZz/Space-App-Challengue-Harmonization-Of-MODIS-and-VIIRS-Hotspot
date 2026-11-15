@@ -1,4 +1,4 @@
-import { FULL_TURN_DEGREES } from './longitude.js';
+import { isInsideIntervals } from './interval-membership.js';
 
 const DEFAULT_SAMPLES_PER_SIDE = 4;
 
@@ -26,9 +26,4 @@ function coverageOfCell({ south, west, sizeDegrees }, intervalsAt, samplesPerSid
     }
   }
   return insideSamples / (samplesPerSide * samplesPerSide);
-}
-
-function isInsideIntervals(longitude, intervals) {
-  return [longitude, longitude + FULL_TURN_DEGREES, longitude - FULL_TURN_DEGREES]
-    .some((candidate) => intervals.some(([start, end]) => candidate >= start && candidate <= end));
 }
