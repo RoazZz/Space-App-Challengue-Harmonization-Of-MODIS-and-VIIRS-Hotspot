@@ -12,10 +12,7 @@ export function createRandom(seed) {
 }
 
 export function hashIntegers(...values) {
-  return values.reduce((hash, value) => {
-    const mixed = (hash ^ ((value | 0) + 0x9e3779b9 + (hash << 6) + (hash >>> 2))) >>> 0;
-    return Math.imul(mixed, 16777619) >>> 0;
-  }, 2166136261);
+  return values.reduce((hash, value) => mixBits(Math.imul(hash, 31) ^ mixBits((value | 0) + 0x9e3779b9)), 2166136261);
 }
 
 export function approximateGaussian(random) {
@@ -37,4 +34,11 @@ export function poisson(random, mean) {
     product *= random();
   } while (product > limit);
   return count;
+}
+
+function mixBits(value) {
+  let mixed = value >>> 0;
+  mixed = Math.imul(mixed ^ (mixed >>> 16), 0x85ebca6b);
+  mixed = Math.imul(mixed ^ (mixed >>> 13), 0xc2b2ae35);
+  return (mixed ^ (mixed >>> 16)) >>> 0;
 }
