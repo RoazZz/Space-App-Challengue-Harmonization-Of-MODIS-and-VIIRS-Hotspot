@@ -26,7 +26,7 @@ export function createSimulatedFireDataSource({ landArea, recordWindow, seed = D
     return Promise.resolve(tileCache.get(tile.id));
   }
 
-  function listDetections(tileId, cellIndex, monthIndex) {
+  async function listDetections(tileId, cellIndex, monthIndex) {
     const { cells, counts, monthCount } = tileCache.get(tileId);
     const index = cellIndex * monthCount + monthIndex;
     const totals = Object.fromEntries(Object.entries(counts).map(([series, values]) => [series, values[index]]));
