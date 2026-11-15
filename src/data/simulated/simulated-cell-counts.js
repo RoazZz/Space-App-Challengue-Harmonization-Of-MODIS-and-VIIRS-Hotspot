@@ -1,6 +1,6 @@
 import { SENSOR_MILESTONES } from '../sensor-catalog.js';
 import { MONTHS_PER_YEAR, monthOfYearOf } from '../../time/month-index.js';
-import { seasonalWeight } from './fire-activity-model.js';
+import { seasonalObservationCoverage, seasonalWeight } from './fire-activity-model.js';
 import { approximateGaussian, poisson } from './seeded-random.js';
 
 const TERRA_ONLY_FACTOR = 0.56;
@@ -36,7 +36,7 @@ export function writeCellCounts(counts, offset, cell, context, random) {
 
 function monthlyExpectation(cell, context, month, season, random) {
   const yearFactor = context.yearFactors[Math.floor(month / MONTHS_PER_YEAR)];
-  const coverage = context.observationCoverage[month];
+  const coverage = seasonalObservationCoverage(cell.peakMonth, monthOfYearOf(month));
   const monthFraction = month === context.monthCount - 1 ? context.lastMonthFraction : 1;
   return cell.expectedPeakDetections * season * yearFactor * Math.exp(0.2 * approximateGaussian(random)) * (0.55 + 0.45 * coverage) * monthFraction;
 }
