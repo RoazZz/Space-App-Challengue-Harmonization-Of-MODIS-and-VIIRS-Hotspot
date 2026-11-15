@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="styles/layout.css">
   <link rel="stylesheet" href="styles/controls.css">
   <link rel="stylesheet" href="styles/map.css">
+  <link rel="stylesheet" href="styles/analysis.css">
 </head>
 <body>
   <div id="map"></div>
@@ -74,6 +75,17 @@
       <div class="area-summary" id="area-summary" aria-live="polite"></div>
     </section>
   </aside>
+
+  <section class="panel analysis-panel" aria-live="polite">
+    <div class="analysis-header">
+      <div>
+        <div class="analysis-title" id="analysis-title"></div>
+        <div class="analysis-subtitle" id="analysis-subtitle"></div>
+      </div>
+      <span class="confidence-pill" id="confidence-pill" hidden></span>
+    </div>
+    <div class="kpi-grid" id="kpi-grid"></div>
+  </section>
 
   <div class="map-controls">
     <button class="base-layer-thumbnail dark-thumbnail is-selected" type="button" data-base-layer="dark" title="Dark basemap"><span>Dark</span></button>
