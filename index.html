@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EmberSpotter · Harmonized MODIS + VIIRS hotspot calendar</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/controls.css">
+  <link rel="stylesheet" href="styles/map.css">
+</head>
+<body>
+  <div id="map"></div>
+
+  <header class="top-bar">
+    <div class="brand">
+      <svg class="brand-logo" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <circle cx="17" cy="17" r="15.5" fill="none" stroke="#ff6b35" stroke-opacity=".55" stroke-width="1.2"/>
+        <circle cx="17" cy="17" r="10.5" fill="none" stroke="#ff6b35" stroke-opacity=".3" stroke-width="1" stroke-dasharray="2 3"/>
+        <path d="M17 7.5c2.6 3.4 5.6 6.2 5.6 10.1a5.6 5.6 0 0 1-11.2 0c0-2 1-3.6 2.3-4.9.2 1.6 1 2.7 2.1 3.2-.6-3.1.2-5.8 1.2-8.4z" fill="#ff6b35"/>
+        <circle cx="17" cy="19.2" r="2.1" fill="#ffd27a"/>
+      </svg>
+      <div>
+        <div class="brand-name">Ember<span>Spotter</span></div>
+        <div class="brand-tagline">Harmonized MODIS + VIIRS hotspot calendar</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="cursor-coordinates" id="cursor-coordinates">Lat —  ·  Lon —</div>
+    <button class="top-bar-button" id="panel-visibility-button" type="button">Hide panels</button>
+  </header>
+
+  <aside class="panel side-panel">
+    <section class="panel-section">
+      <h2 class="section-heading"><span class="section-number">1</span>Area of interest</h2>
+      <div class="segmented-control">
+        <button type="button" data-area-mode="preset" class="is-selected">Preset</button>
+        <button type="button" data-area-mode="rectangle">Rectangle</button>
+        <button type="button" data-area-mode="polygon">Polygon</button>
+        <button type="button" data-area-mode="circle">Lat / Lon</button>
+      </div>
+
+      <div data-area-pane="preset">
+        <p class="hint">Pick a country.</p>
+        <select id="country-select" aria-label="Country"></select>
+      </div>
+
+      <div data-area-pane="rectangle" hidden>
+        <p class="hint">Press <b>Draw</b>, then click and drag on the map.</p>
+        <button class="button full-width" id="rectangle-button" type="button">Draw rectangle</button>
+      </div>
+
+      <div data-area-pane="polygon" hidden>
+        <p class="hint">Press <b>Start</b>, click to add vertices, then double-click or press <b>Finish</b>.</p>
+        <div class="button-row">
+          <button class="button" id="polygon-start-button" type="button">Start</button>
+          <button class="button" id="polygon-undo-button" type="button">Undo</button>
+          <button class="button" id="polygon-finish-button" type="button">Finish</button>
+        </div>
+      </div>
+
+      <div data-area-pane="circle" hidden>
+        <p class="hint">Type coordinates or click the map to pick a center.</p>
+        <div class="field-row">
+          <label class="field">Latitude<input type="number" id="circle-latitude" step="0.01" min="-90" max="90"></label>
+          <label class="field">Longitude<input type="number" id="circle-longitude" step="0.01" min="-180" max="180"></label>
+          <label class="field">Radius km<input type="number" id="circle-radius" step="5" min="5" max="600" value="75"></label>
+        </div>
+        <button class="button full-width spaced" id="circle-apply-button" type="button">Apply circle</button>
+      </div>
+
+      <div class="area-summary" id="area-summary" aria-live="polite"></div>
+    </section>
+  </aside>
+
+  <div class="map-controls">
+    <button class="base-layer-thumbnail dark-thumbnail is-selected" type="button" data-base-layer="dark" title="Dark basemap"><span>Dark</span></button>
+    <button class="base-layer-thumbnail satellite-thumbnail" type="button" data-base-layer="satellite" title="Satellite basemap"><span>Satellite</span></button>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

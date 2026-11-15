@@ -1,0 +1,40 @@
+:root {
+  --background: #0a0e13;
+  --panel-background: rgba(15, 20, 26, 0.965);
+  --field-background: #0d1217;
+  --line: #242d37;
+  --line-strong: #313c48;
+  --text: #e8eef4;
+  --muted: #93a1ae;
+  --accent: #ff6b35;
+  --accent-soft: rgba(255, 107, 53, 0.14);
+  --font: "Inter", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+}
+
+button,
+select,
+input {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--text);
+}
+
+[hidden] {
+  display: none !important;
+}
