@@ -27,7 +27,7 @@ test('csv values with commas or quotes are escaped', () => {
 test('hotspots follow the FIRMS columns, stay inside the area and are marked as demo data', async () => {
   const result = await resultPromise;
   const range = createDateRange(recordWindow.lastMonthIndex - 11, recordWindow.lastMonthIndex, recordWindow);
-  const { text, rowCount } = buildDetectionsCsv(result, range);
+  const { text, rowCount } = await buildDetectionsCsv(result, range);
   const [header, ...lines] = text.split('\n');
   assert.equal(header, 'latitude,longitude,acq_date,acq_time,satellite,instrument,confidence,frp,daynight,demo_flag');
   assert.equal(lines.length, rowCount);
