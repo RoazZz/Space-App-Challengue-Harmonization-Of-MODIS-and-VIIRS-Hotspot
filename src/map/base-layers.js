@@ -1,28 +1,23 @@
 export const BASE_LAYER = Object.freeze({ DARK: 'dark', SATELLITE: 'satellite' });
 
-const CARTO_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
-const ESRI_ATTRIBUTION = 'Imagery &copy; Esri, Maxar, Earthstar Geographics';
+const ESRI_SERVICES = 'https://server.arcgisonline.com/ArcGIS/rest/services';
+const ESRI_CANVAS_ATTRIBUTION = 'Tiles &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors';
+const ESRI_IMAGERY_ATTRIBUTION = 'Imagery &copy; Esri, Maxar, Earthstar Geographics';
+
+const esriTiles = (service, options) => ({ url: `${ESRI_SERVICES}/${service}/MapServer/tile/{z}/{y}/{x}`, options });
 
 const TILE_SOURCES = Object.freeze({
-  darkMap: {
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    options: { subdomains: 'abcd', maxZoom: 19, attribution: CARTO_ATTRIBUTION },
-  },
-  darkLabels: {
-    url: 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
-    options: { subdomains: 'abcd', maxZoom: 19, pane: 'shadowPane', attribution: CARTO_ATTRIBUTION },
-  },
-  satelliteImagery: {
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    options: { maxZoom: 18, attribution: ESRI_ATTRIBUTION },
-  },
+  darkMap: esriTiles('Canvas/World_Dark_Gray_Base', { maxZoom: 16, attribution: ESRI_CANVAS_ATTRIBUTION }),
+  darkLabels: esriTiles('Canvas/World_Dark_Gray_Reference', { maxZoom: 16, pane: 'shadowPane' }),
+  satelliteImagery: esriTiles('World_Imagery', { maxZoom: 18, attribution: ESRI_IMAGERY_ATTRIBUTION }),
+  satelliteLabels: esriTiles('Reference/World_Boundaries_and_Places', { maxZoom: 18, pane: 'shadowPane' }),
 });
 
 export function createBaseLayers(leaflet, map) {
   const tileLayer = ({ url, options }) => leaflet.tileLayer(url, options);
   const layerGroups = {
-    [BASE_LAYER.DARK]: leaflet.layerGroup([tileLayer(TILE_SOURCES.darkMap)]),
-    [BASE_LAYER.SATELLITE]: leaflet.layerGroup([tileLayer(TILE_SOURCES.satelliteImagery), tileLayer(TILE_SOURCES.darkLabels)]),
+    [BASE_LAYER.DARK]: leaflet.layerGroup([tileLayer(TILE_SOURCES.darkMap), tileLayer(TILE_SOURCES.darkLabels)]),
+    [BASE_LAYER.SATELLITE]: leaflet.layerGroup([tileLayer(TILE_SOURCES.satelliteImagery), tileLayer(TILE_SOURCES.satelliteLabels)]),
   };
   let currentName = null;
 

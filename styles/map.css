@@ -57,7 +57,7 @@ body.panels-hidden .map-controls {
 
 .dark-thumbnail {
   background-color: #1b222a;
-  background-image: url("https://a.basemaps.cartocdn.com/dark_all/2/2/1.png");
+  background-image: url("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/2/1/2");
 }
 
 .satellite-thumbnail {
