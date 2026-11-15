@@ -42,7 +42,7 @@ export function createSimulatedFireDataSource({ landArea, recordWindow, seed = D
     return Object.freeze({ tileId: tile.id, monthCount: recordWindow.monthCount, cells: cells.map(toPublicCell), counts, observationCoverage });
   }
 
-  return { recordWindow, strata: SYNTHETIC_STRATA, loadTileCounts };
+  return { recordWindow, strata: SYNTHETIC_STRATA, isDemoData: true, loadTileCounts };
 }
 
 function landCellsOf(tile, landArea) {
