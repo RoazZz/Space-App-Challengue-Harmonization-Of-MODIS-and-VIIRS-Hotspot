@@ -12,7 +12,7 @@ const MESSAGES = Object.freeze({
   drawingCancelled: 'Drawing cancelled.',
 });
 
-export function createAreaSection({ elements, tools, countryPicker, circleForm, getMapCenter, notify, onAreaSelected }) {
+export function createAreaSection({ elements, tools, presetPicker, circleForm, getMapCenter, notify, onAreaSelected }) {
   const { modeButtons, panes, rectangleButton, polygonStartButton, polygonUndoButton, polygonFinishButton } = elements;
 
   function selectMode(mode) {
@@ -21,7 +21,7 @@ export function createAreaSection({ elements, tools, countryPicker, circleForm, 
     modeButtons.forEach((button) => button.classList.toggle(SELECTED_CLASS, button.dataset.areaMode === mode));
     panes.forEach((pane) => { pane.hidden = pane.dataset.areaPane !== mode; });
     if (mode === AREA_MODE.PRESET) {
-      countryPicker.reselect();
+      presetPicker.reselect();
     }
     if (mode === AREA_MODE.CIRCLE) {
       circleForm.prefillCenter(getMapCenter());
@@ -73,5 +73,5 @@ export function createAreaSection({ elements, tools, countryPicker, circleForm, 
   polygonUndoButton.addEventListener('click', () => tools.polygon.undo());
   polygonFinishButton.addEventListener('click', () => tools.polygon.finish());
 
-  return { initialize: () => countryPicker.initialize(), cancelDrawing };
+  return { initialize: () => presetPicker.initialize(), cancelDrawing };
 }

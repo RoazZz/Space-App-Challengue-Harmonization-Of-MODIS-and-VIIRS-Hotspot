@@ -42,8 +42,9 @@
       </div>
 
       <div data-area-pane="preset">
-        <p class="hint">Pick a country.</p>
-        <select id="country-select" aria-label="Country"></select>
+        <p class="hint">Pick a country, then a state or province if you need a smaller area.</p>
+        <label class="field">Country<select id="country-select"></select></label>
+        <label class="field spaced-field" id="subdivision-field" hidden>State or province<select id="subdivision-select"></select></label>
       </div>
 
       <div data-area-pane="rectangle" hidden>

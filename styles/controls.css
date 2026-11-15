@@ -83,8 +83,13 @@
   color: var(--muted);
 }
 
-.field input {
+.field input,
+.field select {
   margin-top: 3px;
+}
+
+.spaced-field {
+  margin-top: 8px;
 }
 
 select,

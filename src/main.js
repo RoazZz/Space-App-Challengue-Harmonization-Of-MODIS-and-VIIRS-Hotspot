@@ -1,5 +1,5 @@
 import { APP_CONFIG } from './config.js';
-import { createCountryCatalog } from './data/country-catalog.js';
+import { createBoundaryCatalog } from './data/boundary-catalog.js';
 import { createAreaLayer } from './map/area-layer.js';
 import { createBaseLayers } from './map/base-layers.js';
 import { createMap } from './map/map-view.js';
@@ -10,12 +10,12 @@ import { createAreaSection } from './ui/area-section.js';
 import { createAreaSummary } from './ui/area-summary.js';
 import { bindBaseLayerPicker } from './ui/base-layer-picker.js';
 import { createCircleForm } from './ui/circle-form.js';
-import { createCountryPicker } from './ui/country-picker.js';
 import { trackCursorCoordinates } from './ui/cursor-coordinates.js';
 import { bindPanelVisibility } from './ui/panel-visibility.js';
+import { createPresetPicker } from './ui/preset-picker.js';
 import { createToast } from './ui/toast.js';
 
-const COUNTRY_LOAD_ERROR = 'Country boundaries could not be loaded. Check your connection and try again.';
+const BOUNDARY_LOAD_ERROR = 'Boundaries could not be loaded. Check your connection and try again.';
 const INVALID_COORDINATES = 'Enter a valid latitude (−90 to 90) and longitude (−180 to 180).';
 
 const leaflet = window.L;
@@ -51,12 +51,16 @@ const areaSection = createAreaSection({
     polygon: createPolygonDrawing(leaflet, map),
     pointPicking: createPointPicking(map),
   },
-  countryPicker: createCountryPicker({
-    selectElement: byId('country-select'),
-    catalog: createCountryCatalog(APP_CONFIG.countriesPath),
+  presetPicker: createPresetPicker({
+    elements: {
+      countrySelect: byId('country-select'),
+      subdivisionSelect: byId('subdivision-select'),
+      subdivisionField: byId('subdivision-field'),
+    },
+    catalog: createBoundaryCatalog(APP_CONFIG.boundaryPaths),
     initialCountryId: APP_CONFIG.initialCountryId,
     onAreaSelected: selectArea,
-    onLoadError: () => toast.show(COUNTRY_LOAD_ERROR),
+    onLoadError: () => toast.show(BOUNDARY_LOAD_ERROR),
   }),
   circleForm: createCircleForm({
     latitudeInput: byId('circle-latitude'),

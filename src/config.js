@@ -1,4 +1,4 @@
 export const APP_CONFIG = Object.freeze({
-  countriesPath: 'data/countries',
+  boundaryPaths: Object.freeze({ countriesPath: 'data/countries', subdivisionsPath: 'data/subdivisions' }),
   initialCountryId: 'mexico',
 });
