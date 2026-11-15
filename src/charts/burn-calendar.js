@@ -12,7 +12,7 @@ const PATTERN_PREFIX = 'calendar';
 const OUT_OF_RANGE_OPACITY = 0.2;
 const HIGHLIGHTED_YEAR_STEP = 5;
 
-export function renderBurnCalendar({ container, result, summary, tooltip }) {
+export function renderBurnCalendar({ container, result, summary, tooltip, selectedMonthIndex, onMonthSelected }) {
   const geometry = calendarGeometry(result);
   const values = rangeValues(result, summary);
   const edges = logClassEdges(values);
@@ -22,9 +22,11 @@ export function renderBurnCalendar({ container, result, summary, tooltip }) {
     ...annualBars(result, summary, geometry),
     ...monthLabels(summary, geometry),
     ...monthCells(result, summary, geometry, edges),
+    ...selectedMonthOutline(selectedMonthIndex, geometry),
     ...monthlyAverageBars(result, summary, geometry),
   ]);
   bindTooltips(svg, result, summary, tooltip);
+  bindMonthSelection(svg, result, onMonthSelected);
   container.replaceChildren(svg);
   return { edges };
 }
@@ -123,7 +125,7 @@ function monthCell(result, summary, { cellSize }, edges, yearOffset, monthOfYear
   const x = LAYOUT.left + yearOffset * cellSize + LAYOUT.gap / 2;
   const y = LAYOUT.top + monthOfYear * cellSize + LAYOUT.gap / 2;
   const size = cellSize - LAYOUT.gap;
-  const base = { 'data-month-index': monthIndex, x, y, width: size, height: size, rx: 2, class: 'calendar-cell' };
+  const base = { 'data-month-index': monthIndex, x, y, width: size, height: size, rx: 2, class: monthIndex > result.recordWindow.lastMonthIndex ? 'calendar-cell' : 'calendar-cell is-selectable' };
   if (monthIndex > result.recordWindow.lastMonthIndex) {
     return [svgElement('rect', { ...base, fill: 'none', stroke: '#2d3741', 'stroke-dasharray': '2 2' })];
   }
@@ -168,6 +170,26 @@ function monthlyAveragesInRange(result, summary) {
       }
     }
     return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+  });
+}
+
+function selectedMonthOutline(monthIndex, { cellSize }) {
+  if (!Number.isInteger(monthIndex)) {
+    return [];
+  }
+  const x = LAYOUT.left + Math.floor(monthIndex / MONTHS_PER_YEAR) * cellSize + LAYOUT.gap / 2;
+  const y = LAYOUT.top + (monthIndex % MONTHS_PER_YEAR) * cellSize + LAYOUT.gap / 2;
+  const size = cellSize - LAYOUT.gap;
+  return [svgElement('rect', { x: x - 0.8, y: y - 0.8, width: size + 1.6, height: size + 1.6, rx: 2.5, fill: 'none', stroke: '#fff', 'stroke-width': 1.6, 'pointer-events': 'none' })];
+}
+
+function bindMonthSelection(svg, result, onMonthSelected) {
+  svg.addEventListener('click', (event) => {
+    const cell = event.target.closest('[data-month-index]');
+    const monthIndex = cell ? Number(cell.dataset.monthIndex) : Number.NaN;
+    if (monthIndex <= result.recordWindow.lastMonthIndex) {
+      onMonthSelected(monthIndex);
+    }
   });
 }
 

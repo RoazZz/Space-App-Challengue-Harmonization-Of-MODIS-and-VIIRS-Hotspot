@@ -32,3 +32,10 @@ function roundToTwoSignificantDigits(value) {
   const magnitude = 10 ** (Math.floor(Math.log10(value)) - 1);
   return Math.round(value / magnitude) * magnitude;
 }
+
+export const DENSITY_CLASS_EDGES = Object.freeze([0.25, 0.5, 1, 2, 4, 8, 16]);
+
+export function densityColor(density) {
+  const classIndex = DENSITY_CLASS_EDGES.findIndex((edge) => density < edge);
+  return SEQUENTIAL_COLORS[classIndex === -1 ? CLASS_COUNT - 1 : classIndex];
+}
