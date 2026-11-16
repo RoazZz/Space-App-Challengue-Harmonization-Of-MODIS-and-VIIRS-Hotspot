@@ -3,9 +3,11 @@ import { join } from 'node:path';
 
 const API_ROOT = 'https://firms.modaps.eosdis.nasa.gov/api';
 const DAYS_PER_REQUEST = 5;
-const REQUEST_SPACING_MS = 650;
-const PARALLEL_REQUESTS = 10;
+const REQUEST_SPACING_MS = 3000;
+const PARALLEL_REQUESTS = 3;
 const RETRY_DELAYS_MS = Object.freeze([5000, 30000, 90000]);
+const TRANSACTION_LIMIT_WAIT_MS = 600000;
+const TRANSACTION_LIMIT_MESSAGES = Object.freeze(['Exceeding allowed transaction limit', 'Invalid MAP_KEY']);
 const MILLISECONDS_PER_DAY = 86400000;
 const SENSOR_PLANS = Object.freeze([
   { sensor: 'modis', standardSource: 'MODIS_SP', nearRealTimeSource: 'MODIS_NRT', firstDate: '2001-01-01' },
@@ -24,6 +26,7 @@ const progressPath = join(outputDirectory, 'progress.json');
 mkdirSync(outputDirectory, { recursive: true });
 const completedWindows = new Set(existsSync(progressPath) ? JSON.parse(readFileSync(progressPath, 'utf8')) : []);
 let nextRequestTime = 0;
+let hasKeyWorked = false;
 
 const availability = await fetchAvailability();
 const windows = SENSOR_PLANS.flatMap((plan) => windowsFor(plan, availability)).filter(({ key }) => !completedWindows.has(key));
@@ -78,7 +81,13 @@ async function fetchText(url) {
     try {
       const response = await fetch(url);
       const text = await response.text();
-      if (response.ok && !text.startsWith('Invalid') && !text.includes('Exceeding')) {
+      if (hasKeyWorked && isTransactionLimit(text)) {
+        await waitForTransactionWindow();
+        attempt -= 1;
+        continue;
+      }
+      if (response.ok && !text.startsWith('Invalid')) {
+        hasKeyWorked = true;
         return text;
       }
       throw new Error(`HTTP ${response.status}: ${text.slice(0, 120)}`);
@@ -90,6 +99,16 @@ async function fetchText(url) {
       await sleep(RETRY_DELAYS_MS[attempt]);
     }
   }
+}
+
+function isTransactionLimit(text) {
+  return TRANSACTION_LIMIT_MESSAGES.some((message) => text.includes(message));
+}
+
+async function waitForTransactionWindow() {
+  console.warn('FIRMS transaction limit reached, waiting 10 minutes');
+  nextRequestTime = Math.max(nextRequestTime, Date.now() + TRANSACTION_LIMIT_WAIT_MS);
+  await sleep(Math.max(0, nextRequestTime - Date.now()));
 }
 
 async function runInParallel(items, task) {
