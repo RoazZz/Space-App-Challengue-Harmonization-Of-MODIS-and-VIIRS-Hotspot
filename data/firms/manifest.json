@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-11-16T07:56:53.071Z",
+  "lastDetectionDate": "2026-11-16",
+  "lastMonthIndex": 310,
+  "firstPointMonthIndex": 299,
+  "regions": [
+    {
+      "name": "mexico",
+      "bounds": {
+        "west": -118.6,
+        "south": 14.4,
+        "east": -86.6,
+        "north": 32.8
+      }
+    }
+  ],
+  "tiles": {
+    "fine": [
+      "fine:10:6",
+      "fine:10:7",
+      "fine:10:8",
+      "fine:10:9",
+      "fine:11:6",
+      "fine:11:7",
+      "fine:11:8",
+      "fine:11:9",
+      "fine:12:6",
+      "fine:12:7",
+      "fine:12:8",
+      "fine:12:9"
+    ],
+    "coarse": [
+      "coarse:10:6",
+      "coarse:10:7",
+      "coarse:10:8",
+      "coarse:10:9",
+      "coarse:11:6",
+      "coarse:11:7",
+      "coarse:11:8",
+      "coarse:11:9",
+      "coarse:12:6",
+      "coarse:12:7",
+      "coarse:12:8",
+      "coarse:12:9"
+    ]
+  },
+  "pointTiles": [
+    "10-8",
+    "12-7",
+    "10-9",
+    "11-9",
+    "12-8",
+    "11-6",
+    "12-6",
+    "11-8",
+    "11-7",
+    "10-7",
+    "12-9",
+    "10-6"
+  ]
+}
