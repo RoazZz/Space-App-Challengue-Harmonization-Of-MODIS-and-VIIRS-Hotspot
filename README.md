@@ -1,5 +1,7 @@
 # Space-App-Challengue-Harmonization-Of-MODIS-and-VIIRS-Hotspot
 
+**Live app:** https://roazzz.github.io/Space-App-Challengue-Harmonization-Of-MODIS-and-VIIRS-Hotspot/
+
 ## Use of AI
 
 We used Claude, an AI assistant made by Anthropic, to help us build this project. It helped us write and clean up the JavaScript code, write the tests, write the scripts that download NASA FIRMS data, and understand the FIRMS documentation and the MODIS and VIIRS user guides.
