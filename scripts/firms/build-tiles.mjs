@@ -9,6 +9,7 @@ import { monthIndexOf } from '../../src/time/month-index.js';
 const OUTPUT_ROOT = join('data', 'firms');
 const POINT_MONTHS = 12;
 const MODIS_HIGH_CONFIDENCE = 80;
+const VEGETATION_FIRE_TYPE = '0';
 const SERIES = Object.freeze({ modisDay: 0, modisNight: 1, modisHighConfidence: 2, viirsDay: 3, viirsNight: 4 });
 const LEVELS = Object.freeze([GRID_LEVEL.FINE, GRID_LEVEL.COARSE]);
 
@@ -58,6 +59,9 @@ async function readDetections(path, sensor) {
       continue;
     }
     const values = line.split(',');
+    if (!isVegetationFire(values, columns)) {
+      continue;
+    }
     const detection = toDetection(values, columns, sensor);
     if (isInsideBounds(detection.latitude, detection.longitude)) {
       levelGrids.forEach((grid) => countDetection(grid, detection));
@@ -82,6 +86,11 @@ function toDetection(values, columns, sensor) {
     isHighConfidence: sensor === 'modis' ? Number(confidence) >= MODIS_HIGH_CONFIDENCE : confidence === 'h',
     monthIndex: monthIndexFromDate(values[columns.acq_date]),
   };
+}
+
+function isVegetationFire(values, columns) {
+  const type = values[columns.type];
+  return columns.type === undefined || type === undefined || type === '' || type === VEGETATION_FIRE_TYPE;
 }
 
 function countDetection({ level, cellLookup }, detection) {
